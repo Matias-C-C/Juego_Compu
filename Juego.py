@@ -10,13 +10,15 @@ ALTO = 650
 e, m = 400, 10
 x, y = 400, 500
 vel = 10
+velocidad = 8
 fps = 30
 
 clock = pygame.time.Clock()
 pantalla = None
 ruta_imagen = 'imagen_fondo.png'
 ruta_menu = 'fondo_d_menu.png'
-ruta_avatar = ['player.png', 'avatar.png']
+fondo_avatar = 'fondo avatar.png'
+ruta_avatar = ['player.png', 'avatar.png', 'avatar2.png']
 #endregion
 
 def dibujar_texto(texto, fuente, color, x, y):
@@ -29,6 +31,7 @@ def menu_inicio():
     boton_jugar = pygame.Rect(0, 0, 0, 0)
     boton_exit = pygame.Rect(0, 0, 0, 0)
     boton_avatar = pygame.Rect(0, 0, 0, 0)
+    boton_score = pygame.Rect(0, 0, 0, 0)
 
     ejecutando_menu = True
     while ejecutando_menu:
@@ -44,6 +47,12 @@ def menu_inicio():
         color_jugar = ROJO if boton_jugar.collidepoint(mouse_pos) else BLANCO
         boton_jugar = dibujar_texto("JUGAR", FUENTE_BOTON, color_jugar, ANCHO // 3, ALTO // 1.75)
 
+        color_avatar = ROJO if boton_avatar.collidepoint(mouse_pos) else BLANCO
+        boton_avatar = dibujar_texto("AVATAR", FUENTE_BOTON, color_avatar, ANCHO // 3, ALTO // 1.30)
+
+        color_score = ROJO if boton_score.collidepoint(mouse_pos) else BLANCO
+        boton_score = dibujar_texto("SCORE", FUENTE_BOTON, color_score, ANCHO // 1.5, ALTO // 1.30)
+
         color_exit = ROJO if boton_exit.collidepoint(mouse_pos) else BLANCO
         boton_exit = dibujar_texto("EXIT", FUENTE_BOTON, color_exit, ANCHO // 1.5, ALTO // 2.25 + 80)
 
@@ -55,6 +64,14 @@ def menu_inicio():
         if boton_exit.collidepoint(mouse_pos) and click[0]:
             pygame.quit()
             sys.exit()
+        
+        if boton_avatar.collidepoint(mouse_pos) and click[0]:
+            pygame.time.wait(200)
+            avatar()
+        
+        if boton_score.collidepoint(mouse_pos) and click[0]:
+            pygame.quit()
+            sys.exit()
 
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
@@ -64,15 +81,45 @@ def menu_inicio():
         pygame.display.flip()
         clock.tick(60)
 
+def avatar():
+    corriendo = True
+    while corriendo:
+        for evento in pygame.event.get():
+            if evento.type == pygame.QUIT:
+                corriendo = False
+        
+        fondito = pygame.image.load(fondo_avatar)
+        fondito = pygame.transform.scale(fondito, (ANCHO, ALTO))
+
+def enemigo():
+    enemigo = pygame.image.load('enemigo.png')
+    enemigo_rect = enemigo.get_rect()
+    enemigo_rect.topleft = (e, m)
+    fondo = pygame.image.load(ruta_imagen)
+    fondo = pygame.transform.scale(fondo, (ANCHO, ALTO))
+    
+    corriendo = True
+    while corriendo:
+        for evento in pygame.event.get():
+            if evento.type == pygame.QUIT:
+                corriendo = False
+        
+        if enemigo_rect.e < 0:
+            enemigo_rect.e += velocidad
+        if enemigo_rect.e > ANCHO - enemigo_rect.width:
+            enemigo_rect.e -= velocidad
+
+        pantalla.blit(fondo, (0, 0))
+        pantalla.blit(enemigo, enemigo_rect)
+        pygame.display.flip()
+        clock.tick(fps)
+        corriendo = False
+
 def jugador_enemigo():
     avatar = random.choice(ruta_avatar)
     jugador = pygame.image.load(avatar)
     jugador_rect = jugador.get_rect()
     jugador_rect.topleft = (x, y)
-
-    enemigo = pygame.image.load('enemigo.png')
-    enemigo_rect = enemigo.get_rect()
-    enemigo_rect.topleft = (e, m)
 
     fondo = pygame.image.load(ruta_imagen)
     fondo = pygame.transform.scale(fondo, (ANCHO, ALTO))
@@ -82,7 +129,7 @@ def jugador_enemigo():
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
                 corriendo = False
-
+        
         teclas = pygame.key.get_pressed()
 
         if teclas[pygame.K_LEFT]:
@@ -96,9 +143,9 @@ def jugador_enemigo():
             jugador_rect.x = ANCHO - jugador_rect.width
 
         pantalla.blit(fondo, (0, 0))
-        pantalla.blit(enemigo, enemigo_rect)
         pantalla.blit(jugador, jugador_rect)
-
+        enemigo()
+        
         pygame.display.flip()
         clock.tick(fps)
 
