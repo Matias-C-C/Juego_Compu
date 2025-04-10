@@ -1,19 +1,28 @@
+#region Importaciones y declaraciones
 import pygame, sys
 
 BLANCO = (255, 255, 255)
 ROJO = (255, 0, 0)
-ANCHO = 800
+ANCHO = 1000
 ALTO = 650
+e, m = 400, 10
 x, y = 400, 500
 vel = 10
 fps = 30
 clock = pygame.time.Clock()
 pantalla = None
+#endregion
 
-def jugador():
+def jugador_enemigo():
     jugador = pygame.image.load('player.png')
     jugador_rect = jugador.get_rect()
     jugador_rect.topleft = (x, y)
+    enemigo = pygame.image.load('enemigo.png')
+    enemigo_rect = jugador.get_rect()
+    enemigo_rect.topleft = (e, m)
+    fondo = pygame.image.load(ruta_imagen)
+    fondo = pygame.transform.scale(fondo, (ANCHO, ALTO))
+
     corriendo = True
     while corriendo:
         for evento in pygame.event.get():
@@ -29,9 +38,11 @@ def jugador():
 
         if jugador_rect.x < 0:
             jugador_rect.x = 0
-        if jugador_rect.x > ANCHO:
-            jugador_rect.x = 750
+        if jugador_rect.x > ANCHO - jugador_rect.width:
+            jugador_rect.x = ANCHO - jugador_rect.width
 
+        pantalla.blit(fondo, (0, 0))
+        pantalla.blit(enemigo, enemigo_rect)
         pantalla.blit(jugador, jugador_rect)
         pygame.display.flip()
         clock.tick(fps)
@@ -45,49 +56,51 @@ def pantalla_inicio(ruta_imagen):
     pantalla.blit(fondo, (0, 0))
     pygame.display.flip()
 
-def menu(ruta_menu):
-    fondo_menu = pygame.image.load(ruta_menu)
-    fondo_menu = pygame.transform.scale(fondo_menu, (ANCHO, ALTO))
-    pantalla.blit(fondo_menu, (0, 0))
-    pygame.display.flip()
+def dibujar_texto(texto, fuente, color, x, y):
+        render = fuente.render(texto, True, color)
+        rect = render.get_rect(center=(x, y))
+        pantalla.blit(render, rect)
+        return rect
 
-    eleccion1 = FUENTE_MINI.render('JUGAR', True, ROJO)
-    eleccion1_rect = eleccion1.get_rect(center=(ANCHO // 4, ALTO // 2))
-    
-    eleccion2 = FUENTE_MINI.render('EXIT', True, ROJO)
-    eleccion2_rect = eleccion2.get_rect(center=(ANCHO // 2, ALTO // 2))
-    
-    pantalla.blit(eleccion1, eleccion1_rect)
-    pantalla.blit(eleccion2, eleccion2_rect)
+def dibujar_boton():
+        fondo_menu = pygame.image.load(ruta_menu)
+        fondo_menu = pygame.transform.scale(fondo_menu, (ANCHO, ALTO))
+        pantalla.blit(fondo_menu, (0, 0))
+        mouse_pos = pygame.mouse.get_pos()
+        click = pygame.mouse.get_pressed()
+        
+        boton_jugar = pygame.Rect(0, 0, 0, 0) 
+        boton_exit = pygame.Rect(0, 0, 0, 0)
 
-    pygame.display.flip()
+        dibujar_texto("Space Invaders", FUENTE_TITULO, BLANCO, ANCHO // 2, ALTO // 4)
+        color_jugar = ROJO if boton_jugar.collidepoint(mouse_pos) else BLANCO
+        boton_jugar_rect = dibujar_texto("JUGAR", FUENTE_BOTON, color_jugar, ANCHO // 2, ALTO // 2)
+        
+        color_exit = ROJO if boton_exit.collidepoint(mouse_pos) else BLANCO
+        boton_exit_rect = dibujar_texto("EXIT", FUENTE_BOTON, color_exit, ANCHO // 2, ALTO // 2 + 80)
 
-def eleccion():
-    eleccion = None
-    while eleccion is None:
-        for evento in pygame.event.get():
-            if evento.type == pygame.QUIT:
+        if boton_jugar_rect.collidepoint(mouse_pos):
+            if click[0]:  
+                pantalla_inicio()
+
+        if boton_exit_rect.collidepoint(mouse_pos):
+            if click[0]:
                 pygame.quit()
                 sys.exit()
-            if evento.type == pygame.MOUSEBUTTONDOWN:
-                if ALTO // 2 - TAM_CELDA // 2 <= evento.pos[1] <= ALTO // 2 + TAM_CELDA // 2:
-                    if ANCHO // 4 - 50 <= evento.pos[0] <= ANCHO // 4 + 50:
-                        eleccion = 'JUGAR'
-                    elif ANCHO // 2 - 50 <= evento.pos[0] <= ANCHO // 2 + 50:
-                        eleccion = 'EXIT'
-   
-    if eleccion == 'JUGAR':
-        pantalla_inicio(ruta_imagen)
-    elif eleccion == 'EXIT':
-        next
+
+            boton_jugar = boton_jugar_rect
+            boton_exit = boton_exit_rect
+
+            pygame.display.flip()
+            clock.tick(60)
 
 def inicio():
-    global pantalla, ruta_imagen, ruta_menu, FUENTE, FUENTE_MINI
+    global pantalla, ruta_imagen, ruta_menu, FUENTE_TITULO, FUENTE_BOTON
     pygame.init()
-    FUENTE = pygame.font.SysFont('Arial', 80)
-    FUENTE_MINI = pygame.font.SysFont('Arial', 30)
     ruta_imagen = 'imagen_fondo.png'
     ruta_menu = 'fondo_d_menu.png'
+    FUENTE_TITULO = pygame.font.SysFont('Arial', 80)
+    FUENTE_BOTON = pygame.font.SysFont('Arial', 40)
     pantalla = pygame.display.set_mode((ANCHO, ALTO))
     pygame.display.set_caption("Space Invaders")
     
@@ -96,10 +109,10 @@ def inicio():
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
                 corriendo = False
-        #menu(ruta_menu)
-        #eleccion()
+        dibujar_texto("Space Invaders", FUENTE_TITULO, BLANCO, ANCHO // 2, ALTO // 4)
+        dibujar_boton()
         pantalla_inicio(ruta_imagen)
-        jugador()
+        jugador_enemigo()
 
     pygame.quit()
 
