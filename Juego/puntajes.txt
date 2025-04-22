@@ -1,6 +1,7 @@
-10
-8
-8
-8
-120
-120
+tute:120
+ma:120
+mati:48
+dx:8
+fernando:6
+xd:3
+vir:3
