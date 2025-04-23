@@ -54,7 +54,9 @@ def ingresar_nombre():
     nombre = ""
     ingresando = True
     while ingresando:
-        pantalla.fill(NEGRO)
+        fondo = pygame.image.load(fondo_score)
+        fondo = pygame.transform.scale(fondo, (ANCHO, ALTO))
+        pantalla.blit(fondo, (0, 0))
         dibujar_texto("Ingresa tu nombre", FUENTE_TITULO, BLANCO, ANCHO // 2, ALTO // 3)
         dibujar_texto(nombre, FUENTE_BOTON, BLANCO, ANCHO // 2, ALTO // 2)
         for evento in pygame.event.get():
@@ -92,7 +94,7 @@ def mostrar_puntajes():
         mouse_pos = pygame.mouse.get_pos()
         click = pygame.mouse.get_pressed()
 
-        volver_btn = dibujar_texto("VOLVER", FUENTE_BOTON, AZUL if pygame.Rect(430, 580, 140, 40).collidepoint(mouse_pos) else BLANCO, ANCHO // 2, 600)
+        volver_btn = dibujar_texto("VOLVER", FUENTE_BOTON, ROJO if pygame.Rect(430, 580, 140, 40).collidepoint(mouse_pos) else BLANCO, ANCHO // 2, 600)
 
         if volver_btn.collidepoint(mouse_pos) and click[0]:
             pygame.time.wait(200)
@@ -109,6 +111,7 @@ def mostrar_puntajes():
 def jugador_enemigo():
     global avatar_seleccionado, nombre_jugador
     jugador = pygame.image.load(avatar_seleccionado)
+    jugador = pygame.transform.scale(jugador, (100, 100))
     jugador_rect = jugador.get_rect()
     jugador_rect.topleft = (x, y)
 
@@ -134,6 +137,7 @@ def jugador_enemigo():
     puntos = 0
     vidas = 3
     ultimo_disparo_enemigo = pygame.time.get_ticks()
+    ultimo_disparo_jugador = pygame.time.get_ticks()
     fondo = pygame.image.load(ruta_imagen)
     fondo = pygame.transform.scale(fondo, (ANCHO, ALTO))
 
@@ -146,8 +150,12 @@ def jugador_enemigo():
                 pygame.quit()
                 sys.exit()
             if evento.type == pygame.KEYDOWN and evento.key == pygame.K_SPACE:
-                nueva_bala = pygame.Rect(jugador_rect.centerx, jugador_rect.top, 5, 10)
-                balas_jugador.append(nueva_bala)
+                ahora = pygame.time.get_ticks()
+                
+                if ahora - ultimo_disparo_jugador >= 1000: 
+                    nueva_bala = pygame.Rect(jugador_rect.centerx, jugador_rect.top, 5, 10)
+                    balas_jugador.append(nueva_bala)
+                    ultimo_disparo_jugador = ahora
 
         teclas = pygame.key.get_pressed()
         if teclas[pygame.K_LEFT]:
@@ -163,7 +171,7 @@ def jugador_enemigo():
                 balas_jugador.remove(bala)
 
         for bala in balas_enemigas[:]:
-            bala.y += 7
+            bala.y += 15
             if bala.y > ALTO:
                 balas_enemigas.remove(bala)
 
@@ -196,7 +204,7 @@ def jugador_enemigo():
                     break
 
         ahora = pygame.time.get_ticks()
-        if ahora - ultimo_disparo_enemigo > 3000 and enemigos:
+        if ahora - ultimo_disparo_enemigo > 1500 and enemigos:
             enemigo_random = random.choice(enemigos)
             bala = pygame.Rect(enemigo_random.centerx, enemigo_random.bottom, 5, 10)
             balas_enemigas.append(bala)
@@ -293,15 +301,13 @@ def avatar():
         img = pygame.transform.scale(img, (100, 100))
         imagenes_avatar[i] = img
         rect = img.get_rect()
-        rect.topleft = (150 + i * 250, 300)
+        rect.topleft = (150 + i * 200, 300)
         rects_avatar.append(rect)
 
     while corriendo:
         for evento in pygame.event.get():
-            if evento.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-            elif evento.type == pygame.MOUSEBUTTONDOWN:
+            if evento.type == pygame.MOUSEBUTTONDOWN:
+                print ("holaaa")
                 for i, rect in enumerate(rects_avatar):
                     if rect.collidepoint(evento.pos):
                         avatar_seleccionado = ruta_avatar[i]

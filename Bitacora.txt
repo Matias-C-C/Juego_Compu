@@ -1,0 +1,6 @@
+El comienzo del juego no fue muy complicado, coloque una imagen de fondo y un jugador esatico (por el momento). Luego, a medida que avanzaba, el proyecto se volvia un poco mas complejo, la creacion de las balas, el movimiento de los enemigos, el menu de inicio, etc. Los pequeños detalles podian cambiar el juego entero. Tuve que recurrir a ChatGPT varias veces para que me explicara como hacer algunas cosas y poder entender como poder aplicarlo en mi trabajo.
+
+Principales problemas:
+-Movimiento de enemigos
+-Balas del jugador y enemigos
+-Seleccion del avatar

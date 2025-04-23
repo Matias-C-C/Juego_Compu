@@ -1,7 +1,4 @@
-tute:120
-ma:120
-mati:48
-dx:8
-fernando:6
-xd:3
-vir:3
+thomas:120
+matias:23
+na:9
+ujbijhbb:7
