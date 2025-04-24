@@ -1,4 +1,3 @@
-thomas:120
-matias:23
-na:9
-ujbijhbb:7
+tito:1400
+juli:500
+thomas:48

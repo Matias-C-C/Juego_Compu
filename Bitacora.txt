@@ -1,5 +1,14 @@
 El comienzo del juego no fue muy complicado, coloque una imagen de fondo y un jugador esatico (por el momento). Luego, a medida que avanzaba, el proyecto se volvia un poco mas complejo, la creacion de las balas, el movimiento de los enemigos, el menu de inicio, etc. Los pequeños detalles podian cambiar el juego entero. Tuve que recurrir a ChatGPT varias veces para que me explicara como hacer algunas cosas y poder entender como poder aplicarlo en mi trabajo.
 
+Primeras clases:
+Me centraba en la creacion del juego en si, la idea era que luego de tener la base hecha puediera agregarle cosas como los tiempos de espera, menu y mas opciones.
+
+Siguientes clases:
+Ya con la base del juego terminada, empecé a crear el menu y distintas opciones dentro del mismo, tales como la eleccion de avatares y el score global.
+
+Clases finales:
+Finalmente, tenia que darle algunos toque finales como la cantidad de balas a disparar, la velocidad de las mismas, el correcto orden de los puntajes, etc. Ademas, trate de implementar sonidos y un modo multijugador, aunque muy superficial.
+
 Principales problemas:
 -Movimiento de enemigos
 -Balas del jugador y enemigos

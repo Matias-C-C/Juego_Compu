@@ -75,11 +75,15 @@ def ingresar_nombre():
         pygame.display.flip()
         clock.tick(30)
 
+def mostrar_vidas_solo(vidas):
+    for i in range(vidas):
+        pygame.draw.rect(pantalla, AZUL, (900 - i*30, 10, 20, 20))
+
 def mostrar_vidas(vidas, vidas2):
     for i in range(vidas):
-        pygame.draw.rect(pantalla, ROJO, (900 - i*30, 60, 20, 20))
-    for i in range(vidas2):
-        pygame.draw.rect(pantalla, AZUL, (100 - i*30, 60, 20, 20))
+        pygame.draw.rect(pantalla, AZUL, (900 - i*30, 60, 20, 20))
+    for i in range(vidas2):        
+        pygame.draw.rect(pantalla, ROJO, (100 - i*30, 60, 20, 20))
 
 def mostrar_puntajes():
     ejecutando = True
@@ -119,7 +123,7 @@ def multijugador():
 
     jugador2 = pygame.image.load('Personajes\\avatar.png')
     jugador2 = pygame.transform.scale(jugador2, (100, 100))
-    jugador2_rect = jugador.get_rect()
+    jugador2_rect = jugador2.get_rect()
     jugador2_rect.topleft = (x2, y2)
 
     enemigo_img = pygame.image.load('Personajes\\enemigo.png')
@@ -142,7 +146,8 @@ def multijugador():
     balas_jugador = []
     balas_jugador2 = []
     balas_enemigas = []
-    puntos = 0
+    puntos_jugador1 = 0  
+    puntos_jugador2 = 0 
     vidas = 3
     vidas2 = 3
     ultimo_disparo_enemigo = pygame.time.get_ticks()
@@ -159,19 +164,21 @@ def multijugador():
             if evento.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            if evento.type == pygame.KEYDOWN and evento.key == pygame.K_SPACE and evento.key == pygame.K_w:
-                ahora = pygame.time.get_ticks()
-                ahora2 = pygame.time.get_ticks()
-                
-                if ahora - ultimo_disparo_jugador >= 1000: 
-                    nueva_bala = pygame.Rect(jugador_rect.centerx, jugador_rect.top, 5, 10)
-                    balas_jugador.append(nueva_bala)
-                    ultimo_disparo_jugador = ahora
 
-                if ahora2 - ultimo_disparo_jugador2 >= 1000: 
-                    nueva_bala = pygame.Rect(jugador2_rect.centerx, jugador2_rect.top, 5, 10)
-                    balas_jugador2.append(nueva_bala)
-                    ultimo_disparo_jugador2 = ahora2
+            if evento.type == pygame.KEYDOWN:
+                if evento.key == pygame.K_SPACE:  
+                    ahora = pygame.time.get_ticks()
+                    if ahora - ultimo_disparo_jugador >= 1000:  
+                        nueva_bala = pygame.Rect(jugador_rect.centerx, jugador_rect.top, 5, 10)
+                        balas_jugador.append(nueva_bala)
+                        ultimo_disparo_jugador = ahora
+
+                if evento.key == pygame.K_w: 
+                    ahora2 = pygame.time.get_ticks()
+                    if ahora2 - ultimo_disparo_jugador2 >= 1000: 
+                        nueva_bala2 = pygame.Rect(jugador2_rect.centerx, jugador2_rect.top, 5, 10)
+                        balas_jugador2.append(nueva_bala2)
+                        ultimo_disparo_jugador2 = ahora2
 
         teclas = pygame.key.get_pressed()
         if teclas[pygame.K_LEFT]:
@@ -184,7 +191,7 @@ def multijugador():
             jugador2_rect.x += vel
 
         jugador_rect.x = max(0, min(ANCHO - jugador_rect.width, jugador_rect.x))
-        jugador2_rect.x = max(0, min(ANCHO - jugador_rect.width, jugador_rect.x))
+        jugador2_rect.x = max(0, min(ANCHO - jugador2_rect.width, jugador2_rect.x))
 
         for bala in balas_jugador[:]:
             bala.y -= 15
@@ -206,13 +213,13 @@ def multijugador():
                 balas_enemigas.remove(bala)
                 vidas -= 1
                 if vidas <= 0:
-                    pantalla_fin("Jugador 1 ha perdido", puntos)
+                    pantalla_fin("Jugador 1 ha perdido", puntos_jugador1)
                     return
             if bala.colliderect(jugador2_rect):
                 balas_enemigas.remove(bala)
                 vidas2 -= 1
                 if vidas2 <= 0:
-                    pantalla_fin("Jugador 2 ha perdido", puntos)
+                    pantalla_fin("Jugador 2 ha perdido", puntos_jugador2)
                     return
 
         mover_abajo = False
@@ -231,15 +238,15 @@ def multijugador():
                 if bala.colliderect(enemigo_rect):
                     balas_jugador.remove(bala)
                     enemigos.remove(enemigo_rect)
-                    puntos += 1
+                    puntos_jugador1 += 100  
                     break
-        
+
         for bala in balas_jugador2[:]:
             for enemigo_rect in enemigos[:]:
                 if bala.colliderect(enemigo_rect):
                     balas_jugador2.remove(bala)
                     enemigos.remove(enemigo_rect)
-                    puntos += 1
+                    puntos_jugador2 += 100  
                     break
 
         ahora = pygame.time.get_ticks()
@@ -256,25 +263,26 @@ def multijugador():
         if oleada_en_espera and pygame.time.get_ticks() - tiempo_oleada >= 3000:
             filas_enemigos += 1
             if filas_enemigos > 5:
-                guardar_puntaje(nombre_jugador, puntos)
-                pantalla_fin("¡GANASTE EL JUEGO!", puntos)
+                guardar_puntaje(nombre_jugador, puntos_jugador1)
+                pantalla_fin("¡GANASTE EL JUEGO!", puntos_jugador1)
                 return
             enemigos = generar_enemigos(filas_enemigos)
             oleada_en_espera = False
 
         pantalla.blit(fondo, (0, 0))
         pantalla.blit(jugador, jugador_rect)
+        pantalla.blit(jugador2, jugador2_rect)
         for enemigo_rect in enemigos:
             pantalla.blit(enemigo_img, enemigo_rect)
         for bala in balas_jugador:
             pygame.draw.rect(pantalla, ROJO, bala)
         for bala in balas_jugador2:
-            pygame.draw.rect(pantalla, ROJO, bala)
+            pygame.draw.rect(pantalla, AZUL, bala)  
         for bala in balas_enemigas:
             pygame.draw.rect(pantalla, BLANCO, bala)
 
-        dibujar_texto(f"Puntos: {puntos}", FUENTE_BOTON, BLANCO, 100, 30)
-        dibujar_texto(f"Puntos 2: {puntos}", FUENTE_BOTON, BLANCO, 850, 30)
+        dibujar_texto(f"Puntos Jugador 1: {puntos_jugador1}", FUENTE_BOTON, BLANCO, 100, 30)
+        dibujar_texto(f"Puntos Jugador 2: {puntos_jugador2}", FUENTE_BOTON, BLANCO, 800, 30)
         mostrar_vidas(vidas, vidas2)
 
         pygame.display.flip()
@@ -416,7 +424,7 @@ def jugador_enemigo():
                 if bala.colliderect(enemigo_rect):
                     balas_jugador.remove(bala)
                     enemigos.remove(enemigo_rect)
-                    puntos += 1
+                    puntos += 100
                     break
 
         ahora = pygame.time.get_ticks()
@@ -449,7 +457,7 @@ def jugador_enemigo():
             pygame.draw.rect(pantalla, BLANCO, bala)
 
         dibujar_texto(f"Puntos: {puntos}", FUENTE_BOTON, BLANCO, 100, 30)
-        mostrar_vidas(vidas)
+        mostrar_vidas_solo(vidas)
 
         pygame.display.flip()
         clock.tick(fps)
