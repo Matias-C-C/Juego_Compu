@@ -1,3 +1,4 @@
 tito:1400
 juli:500
+vir:500
 thomas:48
